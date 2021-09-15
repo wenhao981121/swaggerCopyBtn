@@ -24,7 +24,7 @@
             document.body.appendChild(containerDom);
         }
         return function (text) {
-            const boxDom = document.createElement("div");
+            var boxDom = document.createElement("div");
             boxDom.textContent = text;
             boxDom.style.cssText =
                 "padding:5px 15px;background-color:#299a75;color:white;border-radius:5px;margin-top:7px;transition: all 0.5s;box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);";
@@ -38,7 +38,7 @@
             }, 1500);
         };
     })();
-    
+
     var createTemplate = function (name, url, method, remark) {
         var templ = `//${remark}\n export const ${name}= Simple.Store.create({\n url:'_host:/${url}',\n method:'${method}',\n params:{\n \n},\n dataFormat(type,params,json){\n return json\n}\n})\n \n`;
         return templ;

@@ -1,2 +1,2 @@
 # swaggerCopyBtn
-让swagger文档拥有复制功能和直接生成对用store代码功能
+通过游览器书签的形式，让swagger文档拥有复制功能和直接生成对用store代码功能

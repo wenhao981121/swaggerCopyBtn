@@ -13,7 +13,7 @@
             document.execCommand("copy");
         }
     })();
-    
+
     var toast = (function () {
         var containerDom = document.getElementById("ahao-toast-container");
         if (!containerDom) {
@@ -38,7 +38,17 @@
             }, 1500);
         };
     })();
-
+    var debounce = function (fn, delay, immediate = true) {
+        let timer = null
+        return function (...args) {
+            if (timer) clearTimeout(timer)
+            immediate && !timer && fn.apply(this, args)
+            timer = setTimeout(() => {
+                timer = null
+                !immediate && fn.apply(this, args)
+            }, delay)
+        }
+    }
     var createTemplate = function (name, url, method, remark) {
         var templ = `//${remark}\n export const ${name}= Simple.Store.create({\n url:'_host:/${url}',\n method:'${method}',\n params:{\n \n},\n dataFormat(type,params,json){\n return json\n}\n})\n \n`;
         return templ;
@@ -54,33 +64,48 @@
             });
     };
 
-    document.querySelectorAll(".opblock-summary-path").forEach((n) => {
-        var btn = document.createElement("div");
-        var btn2 = document.createElement("div");
-        btn.textContent = "复制url";
-        btn.style.cssText =
-            "height:40px;margin-left:10px;padding:0 10px;border-radius:4px;display:flex;justify-content: center;align-items: center;background-color:green;color:white;";
-        btn2.textContent = "复制Store";
-        btn2.style.cssText =
-            "height:40px;padding:0 10px;margin-left:10px;border-radius:4px;display:flex;justify-content: center;align-items: center;background-color:green;color:white;";
-        n.parentNode.appendChild(btn);
-        n.parentNode.appendChild(btn2);
-        btn.addEventListener("click", function (e) {
-            var url = n.dataset.path;
-            copy(url);
-            toast("复制成功");
-            e.stopPropagation();
-            return false;
+    var init = function () {
+        document.querySelectorAll(".opblock-summary-path").forEach((n) => {
+            var btn = document.createElement("div");
+            var btn2 = document.createElement("div");
+            btn.textContent = "复制url";
+            btn.style.cssText =
+                "height:40px;margin-left:10px;padding:0 10px;border-radius:4px;display:flex;justify-content: center;align-items: center;background-color:green;color:white;";
+            btn2.textContent = "复制Store";
+            btn2.style.cssText =
+                "height:40px;padding:0 10px;margin-left:10px;border-radius:4px;display:flex;justify-content: center;align-items: center;background-color:green;color:white;";
+            n.parentNode.appendChild(btn);
+            n.parentNode.appendChild(btn2);
+            btn.addEventListener("click", function (e) {
+                var url = n.dataset.path;
+                copy(url);
+                toast("复制成功");
+                e.stopPropagation();
+                return false;
+            });
+            btn2.addEventListener("click", function (e) {
+                var name = urlToName(n.dataset.path);
+                var url = n.dataset.path;
+                var method = n.previousElementSibling.textContent;
+                var remark = n.nextElementSibling.textContent;
+                copy(createTemplate(name, url, method, remark));
+                toast("复制成功");
+                e.stopPropagation();
+                return false;
+            });
         });
-        btn2.addEventListener("click", function (e) {
-            var name = urlToName(n.dataset.path);
-            var url = n.dataset.path;
-            var method = n.previousElementSibling.textContent;
-            var remark = n.nextElementSibling.textContent;
-            copy(createTemplate(name, url, method, remark));
-            toast("复制成功");
-            e.stopPropagation();
-            return false;
-        });
-    });
+    }
+    init();
+    document.getElementById('list').addEventListener('click', debounce(function (e) {
+        if (e.target.className && (~e.target.className.indexOf('node'))) {
+            var timer = setInterval(function () {
+                if (document.querySelectorAll(".opblock-summary-path")) {
+                    clearInterval(timer)
+                    init()
+                }
+            }, 200);
+        }
+
+    }, 400))
+
 })();
